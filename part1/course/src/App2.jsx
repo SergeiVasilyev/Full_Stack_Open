@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 
+const Display = props => <div>{props.value}</div>
 const Button = (props) => (
     <button onClick={props.handleClick}>
       {props.text}
@@ -33,7 +34,7 @@ const App = () => {
     
     return (
       <div>
-        {value}
+        <Display value={value} />
         {/* We can send a function or a value as an argument */}
         <button onClick={hello('world')}>button</button> 
         <button onClick={hello('react')}>button</button>
