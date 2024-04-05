@@ -4,24 +4,6 @@ import './App.css'
 const Title = ({ text }) => <h1>{text}</h1>
 const Button = ({ handleClick, text }) => <button onClick={handleClick}>{text}</button>
 
-const AllFeedback = ({ good, neutral, bad }) => <p>All feedbacks {good + neutral + bad}</p>
-
-const Average = ({ good, neutral, bad }) =>{
-  let score = 0
-  if ((good + neutral + bad) > 0) score = (good - bad) / (good + neutral + bad)
-  return (
-    <p>Average score {score}</p>
-  )
-}
-
-const PositiveFeedback = ({ good, neutral, bad }) => {
-  let positive = 0
-  if ((good + neutral + bad) > 0) positive = (good / (good + neutral + bad)) * 100
-  return (
-    <p>Positive feedback {positive} %</p>
-  )
-}
-
 const StatLine = ({ text, value }) => {
   return (
     <tr>
@@ -44,11 +26,6 @@ const Statistics = ({ good, neutral, bad }) => {
           <StatLine text='Positive feedback' value={(good / (good + neutral + bad)) * 100} />
         </tbody>
       </table>
-      {/* <StatScore good={good} neutral={neutral} bad={bad} />
-
-      <AllFeedback good={good} neutral={neutral} bad={bad} />
-      <Average good={good} neutral={neutral} bad={bad} />
-      <PositiveFeedback good={good} neutral={neutral} bad={bad} /> */}
     </div>
   )
 }
