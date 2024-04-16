@@ -4,7 +4,7 @@ const Total = ({ parts }) => {
     let plural = 's'
     if (total === 1) plural = ''
 
-    return <p>Total {total} course{plural}</p>
+    return <p><b>Total {total} course{plural}</b></p>
 }
 
 export default Total
