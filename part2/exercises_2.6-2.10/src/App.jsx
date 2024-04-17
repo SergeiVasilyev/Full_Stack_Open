@@ -3,12 +3,16 @@ import './App.css'
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
+    { name: 'Arto Hellas', phone: '040-123456' }
   ]) 
   const [newName, setNewName] = useState('')
+  const [newPhone, setNewPhone] = useState('')
 
-  const handleNoteChange = (event) => {
+  const handleNameChange = (event) => {
     setNewName(event.target.value)
+  }
+  const handlePhoneChange = (event) => {
+    setNewPhone(event.target.value)
   }
 
   const addNote = (event) => {
@@ -20,27 +24,34 @@ const App = () => {
     }
 
     const noteObject = {
-      name: newName
+      name: newName,
+      phone: newPhone
     }
     setPersons(persons.concat(noteObject))
     setNewName('')
-    
+    setNewPhone('')
   }
+
+  
 
   return (
     <div className='app'>
       <h2>Phonebook</h2>
       <form onSubmit={addNote}>
         <div>
-          <input value={newName} onChange={handleNoteChange} />
+          <label htmlFor="name">Name</label>
+          <input id="name" value={newName} onChange={handleNameChange} />
+          <label htmlFor="phone">Phone number</label>
+          <input id="phone" value={newPhone} onChange={handlePhoneChange} />
           <button type="submit">add</button>
         </div>
       </form>
+      <br />
       <h2>Numbers</h2>
       <div>
         <ul className='no-bullets'>
         {persons.map(person =>
-          <li key={person.name}>{person.name}</li>
+          <li key={person.name}>{person.name} — {person.phone}</li>
         )}
         </ul>
       </div>
