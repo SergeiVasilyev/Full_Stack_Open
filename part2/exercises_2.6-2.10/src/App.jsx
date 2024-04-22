@@ -1,5 +1,9 @@
 import { useState } from 'react'
+import InputComponent from './components/InputComponent'
+import Persons from './components/Persons'
+import PersonForm from './components/PersonForm'
 import './App.css'
+
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -18,6 +22,9 @@ const App = () => {
   const handlePhoneChange = (event) => {
     setNewPhone(event.target.value)
   }
+  const handleSearch = (event) => {
+    setSearch(event.target.value)
+  }
 
   const addNote = (event) => {
     event.preventDefault()
@@ -25,6 +32,10 @@ const App = () => {
 
     if (persons.find(person => person.name === newName)) {
       return alert(`${newName} is already added to phonebook`)
+    }
+
+    if (newName === '' || newPhone === '') {
+      return alert('Name and phone number are required')
     }
 
     const noteObject = {
@@ -36,33 +47,14 @@ const App = () => {
     setNewPhone('')
   }
 
-  const handleSearch = (event) => {
-    setSearch(event.target.value)
-  }
-
-
   return (
     <div className='app'>
       <h2>Phonebook</h2>
-      <input value={search} onChange={handleSearch} />
-      <form onSubmit={addNote}>
-        <div>
-          <label htmlFor="name">Name</label>
-          <input id="name" value={newName} onChange={handleNameChange} />
-          <label htmlFor="phone">Phone number</label>
-          <input id="phone" value={newPhone} onChange={handlePhoneChange} />
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <InputComponent id="filter" labelName="Search contact" value={search} handleChange={handleSearch} />
+      <PersonForm addNote={addNote} newName={newName} handleNameChange={handleNameChange} newPhone={newPhone} handlePhoneChange={handlePhoneChange} />
       <br />
       <h2>Numbers</h2>
-      <div>
-        <ul className='no-bullets'>
-        {persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())).map(person =>
-          <li key={person.name}>{person.name} — {person.phone}</li>
-        )}
-        </ul>
-      </div>
+      <Persons persons={persons} search={search} />
     </div>
   )
 }
