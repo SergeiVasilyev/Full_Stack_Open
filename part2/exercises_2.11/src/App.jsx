@@ -57,7 +57,7 @@ const App = () => {
       <InputComponent id="filter" labelName="Search contact" value={search} handleChange={handleSearch} />
       <PersonForm addNote={addNote} newName={newName} handleNameChange={handleNameChange} newPhone={newPhone} handlePhoneChange={handlePhoneChange} />
       <br />
-      {persons.length===0 ? '' : <h2>Numbers2</h2>}
+      {persons.length===0 ? '' : <h2>Numbers</h2>}
       <Persons persons={persons} search={search} />
     </div>
   )
