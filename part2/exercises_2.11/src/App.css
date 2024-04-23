@@ -1,0 +1,27 @@
+.app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 5rem;
+  text-align: left;
+  border: 1px solid #ccc;
+}
+
+ul.no-bullets {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+input {
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 12px 14px 12px 14px;
+}
+
+label {
+  /* padding: 12px 12px 12px 0; */
+  display: block;
+  margin-top: 1rem;
+}
