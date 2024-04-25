@@ -4,10 +4,10 @@ const Persons = ({ persons, search, handleDelete }) => {
         <ul className='no-bullets'>
           {persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())).map(person => {
             return (
-              <div key={person.id} className="person">
-                <li key={person.id}>{person.name} — {person.number}</li>
+              <li key={person.id} className="person">
+                <span key={person.id}>{person.name} — {person.number}</span>
                 <button onClick={() => handleDelete(person.id)}>delete</button>
-              </div>
+              </li>
             )}
           )}
         </ul>
