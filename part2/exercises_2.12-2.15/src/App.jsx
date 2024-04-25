@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import InputComponent from './components/InputComponent'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
-import './App.css'
 import contactService from './services/contacts'
+import './App.css'
 
 
 const App = () => {
@@ -12,6 +11,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [search, setSearch] = useState('')
+
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -23,6 +23,7 @@ const App = () => {
     setSearch(event.target.value)
   }
 
+
   useEffect(() => {
     contactService
       .getContacts()
@@ -31,30 +32,37 @@ const App = () => {
       })
   })
 
+
   const addNote = (event) => {
     event.preventDefault()
-    console.log(persons, newName)
-
-    if (persons.find(person => person.name === newName)) {
-      return alert(`${newName} is already added to phonebook`)
-    }
 
     if (newName === '' || newPhone === '') {
       return alert('Name and phone number are required')
     }
 
-    const noteObject = {
-      name: newName,
-      number: newPhone
-    }
+    if (persons.find(person => person.name === newName)) {
+      const contact = persons.find(person => person.name === newName)
+      const changedContact = { ...contact, number: newPhone }
+      contactService
+        .updateContact(contact.id, changedContact)
+        .then(returnedContact => {
+          setPersons(persons.map(person => person.name === newName ? returnedContact : person))
+        })
 
-    contactService
-      .newContact(noteObject)
-      .then(returnedContact => {
-        setPersons(persons.concat(returnedContact))
-        setNewName('')
-        setNewPhone('')
-      })
+    } else {
+      const noteObject = {
+        name: newName,
+        number: newPhone
+      }
+      contactService
+        .newContact(noteObject)
+        .then(returnedContact => {
+          setPersons(persons.concat(returnedContact))
+        })
+    } 
+
+    setNewName('')
+    setNewPhone('')
   }
 
   const handleDelete = (id) => {
