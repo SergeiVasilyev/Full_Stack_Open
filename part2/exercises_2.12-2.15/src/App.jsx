@@ -6,11 +6,24 @@ import contactService from './services/contacts'
 import './App.css'
 
 
+const Notification = ({ message }) => {
+  const messageColor = {
+    color: '#45e314',
+  }
+
+  return (
+    <div style={messageColor} className='message'>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [search, setSearch] = useState('')
+  const [message, setMessage] = useState('')
 
 
   const handleNameChange = (event) => {
@@ -47,7 +60,15 @@ const App = () => {
         .updateContact(contact.id, changedContact)
         .then(returnedContact => {
           setPersons(persons.map(person => person.name === newName ? returnedContact : person))
+          setMessage(`${newName} updated`)
+          setTimeout(() => {
+            setMessage('')
+          }, 5000)
         })
+        .catch(error => {
+          setMessage(`Error: Contact ${newName} not found`)
+        })
+        
 
     } else {
       const noteObject = {
@@ -58,6 +79,15 @@ const App = () => {
         .newContact(noteObject)
         .then(returnedContact => {
           setPersons(persons.concat(returnedContact))
+        })
+        .then(() => {
+          setMessage(`${newName} added to the list`)
+          setTimeout(() => {
+            setMessage('')
+          }, 5000)
+        })
+        .catch(error => {
+          setMessage(`Error: ${error.response.data.error}`)
         })
     } 
 
@@ -72,7 +102,9 @@ const App = () => {
         .deleteContact(id)
         .then(() => {
           setPersons(persons.filter(p => p.id !== id))
-          console.log(persons)
+        })
+        .catch(error => {
+          setMessage(`Error: Information of ${person.name} has already been removed from server`)
         })
     }
   }
@@ -82,6 +114,7 @@ const App = () => {
       <h2>Phonebook</h2>
       <InputComponent id="filter" labelName="Search contact" value={search} handleChange={handleSearch} />
       <PersonForm addNote={addNote} newName={newName} handleNameChange={handleNameChange} newPhone={newPhone} handlePhoneChange={handlePhoneChange} />
+      <Notification message={message} />
       <br />
       {persons.length===0 ? '' : <h2>Numbers</h2>}
       <Persons persons={persons} search={search} handleDelete={handleDelete} />
