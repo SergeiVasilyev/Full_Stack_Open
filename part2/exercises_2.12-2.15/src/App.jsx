@@ -19,7 +19,7 @@ const Notification = ({ message }) => {
 }
 
 const App = () => {
-  const [persons, setPersons] = useState([]) 
+  const [persons, setPersons] = useState(null) 
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [search, setSearch] = useState('')
@@ -107,6 +107,10 @@ const App = () => {
           setMessage(`Error: Information of ${person.name} has already been removed from server`)
         })
     }
+  }
+
+  if (!persons) { 
+    return null 
   }
 
   return (
