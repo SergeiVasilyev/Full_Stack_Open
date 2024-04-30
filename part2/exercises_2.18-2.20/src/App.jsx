@@ -1,7 +1,31 @@
 import { useState, useEffect } from 'react'
 import countryService from './servisces/countries'
+import './App.css'
 
-const ShowCountries = ({ countries }) => {
+
+const ShowButton = ({ show }) => {
+  return (
+    <button onClick={show}>show</button>
+  )
+}
+
+const CountriesList = ({ countries, handleGetCountry }) => {
+  return (
+    <ul className='countries_list'>
+      {countries.map((country) => {
+          return (
+            <li key={country.name.official}>
+              <span>{country.name.official}</span>
+              <ShowButton show={() => handleGetCountry(country.name.official)} />
+            </li>
+          )
+        }
+      )}
+    </ul>
+  )
+}
+
+const ShowCountries = ({ countries, handleGetCountry }) => {
   if (countries.length > 10) {
     return <p>Too many matches, specify another filter</p>
   }
@@ -23,9 +47,7 @@ const ShowCountries = ({ countries }) => {
     )
   }
   return (
-    <ul>
-      {countries.map(country => <li key={country.name.official}>{country.name.official}</li>)}
-    </ul>
+    <CountriesList countries={countries} handleGetCountry={handleGetCountry} />
   )
 }
 
@@ -47,13 +69,20 @@ function App() {
     }
   }
 
+  const handleGetCountry = (countryName) => {
+    countryService
+      .getByName(countryName)
+      .then(country => setCountries([country]))
+  }
 
 
   return (
-    <div>
-      <label htmlFor="search">Find countries</label>
-      <input id="search" value={search} onChange={handleSearch} />
-      <ShowCountries countries={countries} />
+    <div className='app'>
+      <div className='search_wrapper'>
+        <label htmlFor="search">Find countries</label>
+        <input id="search" value={search} onChange={handleSearch} />
+      </div>
+      <ShowCountries countries={countries} handleGetCountry={handleGetCountry} />
     </div>
   )
 }
