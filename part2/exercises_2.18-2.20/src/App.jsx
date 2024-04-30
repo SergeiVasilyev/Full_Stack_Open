@@ -25,24 +25,54 @@ const CountriesList = ({ countries, handleGetCountry }) => {
   )
 }
 
-const ShowCountries = ({ countries, handleGetCountry }) => {
+const ShowWeather = ({ weather }) => {
+  if (!weather) {
+    return null
+  }
+  // return (
+  //   <div>
+  //     <p>Temperature: {weather.main.temp}</p>
+  //   </div>
+  // )
+  return (
+    <div>
+      <p>Temperature: {weather.main.temp} °C</p>
+      <p>Wind: {weather.wind.speed} m/s</p>
+      <p>Humidity: {weather.main.humidity} %</p>
+      <img src={`http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} alt="weather" />
+      <p>{weather.weather[0].description}</p>
+    </div>
+  )
+}
+
+const ShowCountry = ({ country, weather }) => {
+  const languages = []
+  Object.keys(country.languages).forEach(key => languages.push(country.languages[key]))
+  return (
+    <div>
+      <p>Capital: {country.capital}</p>
+      <p>Population: {country.population}</p>
+      <p>Area: {country.area}</p>
+      <h3>Languages</h3>
+      <ul>
+        {languages.map(language => <li key={language}>{language}</li>)}
+      </ul>
+      <img src={country.flags.png} alt="flag" />
+    </div>
+  )
+}
+
+const ShowResponse = ({ countries, weather, handleGetCountry }) => {
   if (countries.length > 10) {
     return <p>Too many matches, specify another filter</p>
   }
   if (countries.length === 1) {
-    const languages = []
-    Object.keys(countries[0].languages).forEach(key => languages.push(countries[0].languages[key]))
     return (
       <div>
         <h1>{countries[0].name.official}</h1>
-        <p>Capital: {countries[0].capital}</p>
-        <p>Population: {countries[0].population}</p>
-        <p>Area: {countries[0].area}</p>
-        <h3>Languages</h3>
-        <ul>
-          {languages.map(language => <li key={language}>{language}</li>)}
-        </ul>
-        <img src={countries[0].flags.png} alt="flag" />
+        <ShowCountry country={countries[0]} weather={weather} />
+        <h3>Weather in {countries[0].capital}</h3>
+        <ShowWeather weather={weather} />
       </div>
     )
   }
@@ -54,6 +84,7 @@ const ShowCountries = ({ countries, handleGetCountry }) => {
 function App() {
   const [countries, setCountries] = useState([])
   const [search, setSearch] = useState('')
+  const [weather, setWeather] = useState(null)
 
 
   const handleSearch = (event) => {
@@ -62,8 +93,7 @@ function App() {
       countryService
         .getAll()
         .then(initialNotes => {
-          let countries = initialNotes.filter(country => country.name.official.toLowerCase().includes(search.toLowerCase()))
-          console.log(countries)
+          let countries = initialNotes.filter(country => country.name.official.toLowerCase().includes(event.target.value.toLowerCase()))
           setCountries(countries)
         })
     }
@@ -75,6 +105,14 @@ function App() {
       .then(country => setCountries([country]))
   }
 
+  useEffect(() => {
+    if (countries.length === 1) {
+    countryService
+      .getWetherForCity(countries[0].capital[0])
+      .then(weather => setWeather(weather))
+    }
+  }, [countries])
+
 
   return (
     <div className='app'>
@@ -82,7 +120,7 @@ function App() {
         <label htmlFor="search">Find countries</label>
         <input id="search" value={search} onChange={handleSearch} />
       </div>
-      <ShowCountries countries={countries} handleGetCountry={handleGetCountry} />
+      <ShowResponse countries={countries} weather={weather} handleGetCountry={handleGetCountry} />
     </div>
   )
 }
