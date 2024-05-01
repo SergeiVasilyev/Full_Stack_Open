@@ -18,11 +18,11 @@ const getWetherForCity = (city) => {
     return request.then(response => response.data)
 }
 
-const getWetherForCity2 = (city) => {
+const getWetherForCityLocalServer = (city) => {
     console.log('city', city)
     const request = axios.get(`http://localhost:3001/moscow`)
     return request.then(response => response.data)
 
 }
 
-export default { getAll, getByName, getWetherForCity }
+export default { getAll, getByName, getWetherForCity, getWetherForCityLocalServer }
