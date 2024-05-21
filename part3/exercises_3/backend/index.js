@@ -1,6 +1,7 @@
 const express = require('express')
 let persons = require('./persons')
 const app = express()
+app.use(express.static('dist'))
 const morgan = require('morgan')
 
 app.use(express.json())
@@ -17,14 +18,14 @@ app.use(morgan(':method :url :res[header] :response-time ms :status :response'))
 
 
 
-app.get('/', (req, res) => {
-  res.send(
-    `<h1>Server running</h1>
-    <a href="/api/persons">http://localhost:3001/api/persons</a>
-    <br>
-    <a href="/info">http://localhost:3001/info</a>`
-  )
-})
+// app.get('/', (req, res) => {
+//   res.send(
+//     `<h1>Server running</h1>
+//     <a href="/api/persons">http://localhost:3001/api/persons</a>
+//     <br>
+//     <a href="/info">http://localhost:3001/info</a>`
+//   )
+// })
 
 
 app.get('/api/persons/', (req, res) => {
@@ -96,7 +97,7 @@ app.get('/info', (req, res) => {
 })
 
 
-const PORT = process.env.PORT || 3002
+const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
