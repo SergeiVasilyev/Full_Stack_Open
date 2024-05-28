@@ -1,6 +1,38 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 app.use(express.static('dist'))
+const Note = require('./models/note')
+console.log(Note)
+
+// Mangoose
+// require('dotenv').config()
+// const mongoose = require('mongoose')
+
+// const password = process.env.FLYPASS
+// // const password = process.argv[2]
+
+// const url =
+//   `mongodb+srv://sergeyvasilyevdev:${password}@cluster0.uxfjgyo.mongodb.net/noteApp?retryWrites=true&w=majority`
+
+// mongoose.set('strictQuery',false)
+// mongoose.connect(url)
+
+// const noteSchema = new mongoose.Schema({
+//   content: String,
+//   important: Boolean,
+// })
+
+// noteSchema.set('toJSON', {
+//   transform: (document, returnedObject) => {
+//     returnedObject.id = returnedObject._id.toString()
+//     delete returnedObject._id
+//     delete returnedObject.__v
+//   }
+// })
+
+// const Note = mongoose.model('Note', noteSchema)
+// !Mangoose
 
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
@@ -42,19 +74,15 @@ let notes = [
 // })
 
 app.get('/api/notes', (request, response) => {
-  response.json(notes)
+  Note.find({}).then(notes => {
+    response.json(notes)
+  })
 })
 
 app.get('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const note = notes.find(note => note.id === id)
-  if (note) {
+  Note.findById(request.params.id).then(note => {
     response.json(note)
-  } else {
-    // response.status(404).end()
-    res.status(404)
-    res.send('Current password does not match')
-  }
+  })
 })
 
 app.delete('/api/notes/:id', (request, response) => {
@@ -76,21 +104,18 @@ const generateId = () => {
 app.post('/api/notes', (request, response) => {
   const body = request.body
 
-  if (!body.content) {
-    return response.status(400).json({ 
-      error: 'content missing' 
-    })
+  if (body.content === undefined) {
+    return response.status(400).json({ error: 'content missing' })
   }
 
-  const note = {
+  const note = new Note({
     content: body.content,
-    important: Boolean(body.important) || false,
-    id: generateId(),
-  }
+    important: body.important || false,
+  })
 
-  notes = notes.concat(note)
-
-  response.json(note)
+  note.save().then(savedNote => {
+    response.json(savedNote)
+  })
 })
 
 
