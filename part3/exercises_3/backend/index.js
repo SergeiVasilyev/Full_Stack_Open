@@ -1,5 +1,9 @@
+require('dotenv').config()
+
 const express = require('express')
-let persons = require('./persons')
+// let persons = require('./persons')
+const Person = require('./models/persons')
+
 const app = express()
 app.use(express.static('dist'))
 const morgan = require('morgan')
@@ -29,19 +33,16 @@ app.use(morgan(':method :url :res[header] :response-time ms :status :response'))
 
 
 app.get('/api/persons/', (req, res) => {
-  res.json(persons)
+  Person.find({}).then(persons => {
+    res.json(persons)
+  })
 })
 
 
 app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
-  const person = persons.find(person => person.id === id)
-  if (person) {
-    res.json(person)
-  } else {
-    res.status(404)
-    res.send('Person not found')
-  }
+  Note.findById(request.params.id).then(note => {
+    res.json(note)
+  })
 })
 
 
@@ -60,31 +61,33 @@ const generateId = () => {
 
 app.post('/api/persons', (req, res) => {
   const body = req.body
-  let id = generateId()
-  
-  if (!body.name) {
-    return res.status(400).json({ 
-      error: 'Name missing' 
-    })
+  console.log('body', body)
+  if (body.name === undefined) {
+    return res.status(400).json({ error: 'Name missing' })
   }
   if (!body.number) {
     return res.status(400).json({ 
       error: 'Number missing' 
     })
   }
-  if (persons.find(person => person.name === body.name)) {
-    return res.status(400).json({ 
-      error: 'Name must be unique' 
-    })
-  }
 
-  const newPerson = {
-    id: id,
+  // if (persons.find(person => person.name === body.name)) {
+  //   return res.status(400).json({ 
+  //     error: 'Name must be unique' 
+  //   })
+  // }
+
+  const newPerson = new Person({
     name: body.name,
     number: body.number
-  }
-  persons = persons.concat(newPerson)
-  res.json(newPerson) // It was wrong in the exercise of part 2: should return just one person, not all persons
+  })
+
+  newPerson.save().then(savedPerson => {
+    res.json(savedPerson)
+  })
+
+  // persons = persons.concat(newPerson)
+  // res.json(newPerson) // It was wrong in the exercise of part 2: should return just one person, not all persons
 })
 
 
