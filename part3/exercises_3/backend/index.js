@@ -42,7 +42,11 @@ app.get('/api/persons/', (req, res) => {
 app.get('/api/persons/:id', (req, res, next) => {
   Person.findById(req.params.id)
   .then(person => {
-    res.json(person)
+    if (person) {
+      res.json(person)
+    } else {
+      res.status(404).end()
+    }
   })
   .catch(error => next(error))
 })
@@ -124,8 +128,6 @@ const errorHandler = (error, request, response, next) => {
   }
   next(error)
 }
-
-// this has to be the last loaded middleware, also all the routes should be registered before this!
 app.use(errorHandler)
 
 
