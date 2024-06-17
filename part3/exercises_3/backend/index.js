@@ -39,29 +39,21 @@ app.get('/api/persons/', (req, res) => {
 })
 
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
   Person.findById(req.params.id)
   .then(person => {
     res.json(person)
   })
+  .catch(error => next(error))
 })
 
 
-// app.delete('/api/persons/:id', (req, res) => {
-//   const id = Number(req.params.id)
-//   persons = persons.filter(person => person.id !== id)
-//   res.status(204).end()
-// })
-
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
   .then(() => {
     res.status(204).end()
   })
-  .catch(error => {
-    console.log(error)
-    res.status(400).end()
-  })
+  .catch(error => next(error))
 })
 
 
@@ -83,12 +75,6 @@ app.post('/api/persons', (req, res) => {
     })
   }
 
-  // if (persons.find(person => person.name === body.name)) {
-  //   return res.status(400).json({ 
-  //     error: 'Name must be unique' 
-  //   })
-  // }
-
   const newPerson = new Person({
     name: body.name,
     number: body.number
@@ -98,8 +84,20 @@ app.post('/api/persons', (req, res) => {
     res.json(savedPerson)
   })
 
-  // persons = persons.concat(newPerson)
-  // res.json(newPerson) // It was wrong in the exercise of part 2: should return just one person, not all persons
+})
+
+
+app.put('/api/persons/:id', (req, res, next) => {
+  const body = req.body
+  const person = {
+    name: body.name,
+    number: body.number
+  }
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then(updatedPerson => {
+      res.json(updatedPerson)
+    })
+    .catch(error => next(error))
 })
 
 
@@ -110,6 +108,26 @@ app.get('/info', (req, res) => {
     <a href="/">Go to main page</a>`
   )
 })
+
+
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(unknownEndpoint)
+
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+  next(error)
+}
+
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+app.use(errorHandler)
+
 
 
 const PORT = process.env.PORT || 3000
