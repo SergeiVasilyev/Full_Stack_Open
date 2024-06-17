@@ -40,16 +40,28 @@ app.get('/api/persons/', (req, res) => {
 
 
 app.get('/api/persons/:id', (req, res) => {
-  Note.findById(request.params.id).then(note => {
-    res.json(note)
+  Person.findById(req.params.id)
+  .then(person => {
+    res.json(person)
   })
 })
 
 
+// app.delete('/api/persons/:id', (req, res) => {
+//   const id = Number(req.params.id)
+//   persons = persons.filter(person => person.id !== id)
+//   res.status(204).end()
+// })
+
 app.delete('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
-  persons = persons.filter(person => person.id !== id)
-  res.status(204).end()
+  Person.findByIdAndDelete(req.params.id)
+  .then(() => {
+    res.status(204).end()
+  })
+  .catch(error => {
+    console.log(error)
+    res.status(400).end()
+  })
 })
 
 
