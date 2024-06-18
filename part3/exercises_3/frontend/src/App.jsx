@@ -66,7 +66,10 @@ const App = () => {
           }, 5000)
         })
         .catch(error => {
-          setMessage(`Error: Contact ${newName} not found`)
+          setMessage(`Error: ${error.response.data.error}`)
+          setTimeout(() => {
+            setMessage('')
+          }, 5000)
         })
         
 
@@ -88,6 +91,9 @@ const App = () => {
         })
         .catch(error => {
           setMessage(`Error: ${error.response.data.error}`)
+          setTimeout(() => {
+            setMessage('')
+          }, 5000)
         })
     } 
 
