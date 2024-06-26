@@ -1,3 +1,5 @@
+/* eslint-disable @stylistic/js/linebreak-style */
+/* eslint-disable no-undef */
 // require('dotenv').config()
 const config = require('./utils/config')
 const express = require('express')
@@ -45,13 +47,14 @@ app.get('/api/notes/:id', (request, response, next) => {
 
 app.delete('/api/notes/:id', (request, response, next) => {
   Note.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
 })
 
 
+// eslint-disable-next-line no-unused-vars
 const generateId = () => {
   console.log(...notes.map(n => n.id))
   const maxId = notes.length > 0

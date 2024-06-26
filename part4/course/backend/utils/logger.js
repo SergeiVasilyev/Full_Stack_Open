@@ -1,3 +1,4 @@
+/* eslint-disable @stylistic/js/linebreak-style */
 const info = (...params) => {
   console.log(...params)
 }

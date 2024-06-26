@@ -1,3 +1,4 @@
+/* eslint-disable @stylistic/js/linebreak-style */
 const mongoose = require('mongoose')
 
 const noteSchema = new mongoose.Schema({

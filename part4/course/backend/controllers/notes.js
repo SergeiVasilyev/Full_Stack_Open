@@ -1,3 +1,4 @@
+/* eslint-disable @stylistic/js/linebreak-style */
 const notesRouter = require('express').Router()
 const Note = require('../models/note')
 
