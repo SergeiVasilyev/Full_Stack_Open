@@ -3,16 +3,17 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
-const Blog = require('./models/blog')
-
+const middleware = require('./utils/middleware')
+const blogsRouter = require('./controllers/blogs')
+const logger = require('./utils/logger')
 
 mongoose.set('strictQuery', false)
 mongoose.connect(config.MONGODB_URI)
   .then(() => {
-    console.log('connected to MongoDB')
+    logger.info('connected to MongoDB')
   })
   .catch((error) => {
-    console.log('error connecting to MongoDB:', error.message)
+    logger.error('error connecting to MongoDB:', error.message)
   })
 
 
@@ -22,24 +23,9 @@ app.use(express.json())
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
+app.use('/api/blogs', blogsRouter)
 
-app.get('/api/blogs', (request, response) => {
-  Blog
-    .find({})
-    .then(blogs => {
-      response.json(blogs)
-    })
-})
-
-app.post('/api/blogs', (request, response) => {
-  const blog = new Blog(request.body)
-
-  blog
-    .save()
-    .then(result => {
-      response.status(201).json(result)
-    })
-})
-
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
 
 module.exports = app
