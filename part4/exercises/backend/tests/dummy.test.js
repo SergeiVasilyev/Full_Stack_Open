@@ -105,3 +105,14 @@ describe('most blogs Lodash', () => {
     })
   })
 })
+
+describe('most likes Lodash', () => {
+  test('when list has only one blog, equals the likes of that', () => {
+    const result = listHelper.mostLikesLodash(blogs)
+    assert.deepStrictEqual(result, 
+    {
+      author: "Edsger W. Dijkstra",
+      likes: 17
+    })
+  })
+})
