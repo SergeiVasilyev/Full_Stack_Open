@@ -49,3 +49,15 @@ test('the first note is about HTTP methods', async () => {
 after(async () => {
   await mongoose.connection.close()
 })
+
+
+// Command to run all tests: npm test
+// Command to run just "only" marked tests: npm test -- --test-only
+// test.only() is used to run only one test
+// Command to run just one test in a file: npm test -- tests/note_api.test.js
+
+// The --tests-by-name-pattern option can be used for running tests with a specific name:
+// npm test -- --test-name-pattern="the first note is about HTTP methods"
+
+// The following command will run all of the tests that contain notes in their name:
+// npm test -- --test-name-pattern="note"
