@@ -40,6 +40,14 @@ blogsRouter.get('/:id', async (request, response) => {
 // })
 
 
+// Post blog using async/await
+blogsRouter.post('/', async (request, response) => {
+  const blog = new Blog(request.body) 
+  const savedBlog = await blog.save()
+  response.status(201).json(savedBlog)
+})
+
+
 
 
 module.exports = blogsRouter
