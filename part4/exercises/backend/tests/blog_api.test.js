@@ -5,6 +5,7 @@ const helper = require('./test_helper')
 const supertest = require('supertest')
 const app = require('../app')
 const assert = require('node:assert')
+const { title } = require('node:process')
 const api = supertest(app)
 
 
@@ -73,6 +74,24 @@ test('likes property by defaults is 0', async () => {
     const blog = blogsAtEnd.find(blog => blog.title === 'Blog test')
     assert.strictEqual(blog.likes, 0)
 })
+
+test('blog without required properties is not added', async () => {
+    const newBlog = {
+        author: 'Sergey V',
+        likes: 153
+    }
+    const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+    // console.log(response.body)
+    for (const error in response.body.errors) {
+        assert.strictEqual(response.body.errors[error].message, "Path `" + response.body.errors[error].path + "` is required.")
+    }
+})
+
+
 
 after(async () => {
     await mongoose.connection.close()

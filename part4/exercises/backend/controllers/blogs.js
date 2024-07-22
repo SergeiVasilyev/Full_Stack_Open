@@ -42,9 +42,13 @@ blogsRouter.get('/:id', async (request, response) => {
 
 // Post blog using async/await
 blogsRouter.post('/', async (request, response) => {
-  const blog = new Blog(request.body) 
-  const savedBlog = await blog.save()
-  response.status(201).json(savedBlog)
+  const blog = new Blog(request.body)
+  try {
+    const savedBlog = await blog.save()
+    response.status(201).json(savedBlog)
+  } catch (error) {
+    response.status(400).json(error)
+  }
 })
 
 
