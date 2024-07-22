@@ -14,10 +14,10 @@ beforeEach(async () => {
   await Note.deleteMany({})
 
   // Promise.all executes the promises it receives in parallel and not garantee particular order
-  const noteObjects = helper.initialNotes
-    .map(note => new Note(note))
-  const promiseArray = noteObjects.map(note => note.save())
-  await Promise.all(promiseArray)
+  // const noteObjects = helper.initialNotes
+  //   .map(note => new Note(note))
+  // const promiseArray = noteObjects.map(note => note.save())
+  // await Promise.all(promiseArray)
   // const results = await Promise.all(promiseArray)
 
   // For..of loop executes the promises it receives in order
