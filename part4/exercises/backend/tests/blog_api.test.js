@@ -108,6 +108,25 @@ test('a blog can be deleted', async () => {
 
 })
 
+test('a blog can be updated', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+
+    const updatedBlog = {
+        ...blogToUpdate,
+        likes: blogToUpdate.likes + 1
+    }
+    await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedBlog)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const contents = blogsAtEnd.map(blog => blog.likes)
+    // console.log(contents)
+    assert.strictEqual(contents.includes(blogToUpdate.likes + 1), true)
+
+})
+
 
 after(async () => {
     await mongoose.connection.close()
