@@ -4,13 +4,13 @@ const User = require('../models/user')
 
 const jwt = require('jsonwebtoken')
 
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-  return null
-}
+// const getTokenFrom = request => {
+//   const authorization = request.get('authorization')
+//   if (authorization && authorization.startsWith('Bearer ')) {
+//     return authorization.replace('Bearer ', '')
+//   }
+//   return null
+// }
 
 
 // Use async/await
@@ -56,7 +56,7 @@ blogsRouter.post('/', async (request, response) => {
   // const blog = new Blog(request.body)
   const body = request.body
 
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
   if (!decodedToken.id) {
     return response.status(401).json({ error: 'token invalid' })
   }
@@ -75,13 +75,6 @@ blogsRouter.post('/', async (request, response) => {
   await user.save()
 
   response.status(201).json(savedBlog)
-
-  // try {
-  //   const savedBlog = await blogObject.save()
-  //   response.status(201).json(savedBlog)
-  // } catch (error) {
-  //   response.status(400).json(error)
-  // }
 })
 
 
