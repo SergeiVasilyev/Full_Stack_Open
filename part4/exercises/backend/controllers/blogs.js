@@ -1,6 +1,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const middleware = require('../utils/middleware')
 
 const jwt = require('jsonwebtoken')
 
@@ -52,15 +53,9 @@ blogsRouter.get('/:id', async (request, response) => {
 
 
 // Post blog using async/await
-blogsRouter.post('/', async (request, response) => {
-  // const blog = new Blog(request.body)
+blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
   const body = request.body
-
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
-  const user = await User.findById(decodedToken.id)
+  const user = request.user
 
   const blogObject = new Blog({
     title: body.title,
@@ -78,17 +73,18 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 
-blogsRouter.delete('/:id', async (request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
+blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
+  const user = request.user
+  console.log('user', user)
   
   const blog = await Blog.findById(request.params.id)
+  if (!blog) {
+    return response.status(404).json({ error: 'blog not found' })
+  }
   if (!blog.user) { // if the blog has no user attribute
     return response.status(401).json({ error: 'This blog was created by another user' })
   }
-  if (blog.user.toString() !== decodedToken.id) { // if the blog was created by another user
+  if (blog.user.toString() !== user.id) { // if the blog was created by another user
     return response.status(401).json({ error: 'This blog was created by another user' })
   }
 

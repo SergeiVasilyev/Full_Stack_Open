@@ -26,6 +26,7 @@ app.use(express.static('dist'))
 app.use(express.json())
 
 app.use(middleware.tokenExtractor)
+// app.use(middleware.userExtractor)
 
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
