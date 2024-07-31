@@ -1,36 +1,15 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
 const middleware = require('../utils/middleware')
 
-const jwt = require('jsonwebtoken')
-
-// const getTokenFrom = request => {
-//   const authorization = request.get('authorization')
-//   if (authorization && authorization.startsWith('Bearer ')) {
-//     return authorization.replace('Bearer ', '')
-//   }
-//   return null
-// }
 
 
-// Use async/await
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
   response.json(blogs)
 })
 
-// Use promises
-// blogsRouter.get('/', (request, response) => {
-//   Blog
-//     .find({})
-//     .then(blogs => {
-//       response.json(blogs)
-//     })
-// })
 
-
-// Use async/await
 blogsRouter.get('/:id', async (request, response) => {
   const blog = await Blog.findById(request.params.id)
   if (blog) {
@@ -40,19 +19,7 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 
-// Use promises
-// blogsRouter.post('/', (request, response) => {
-//   const blog = new Blog(request.body)
 
-//   blog
-//     .save()
-//     .then(result => {
-//       response.status(201).json(result)
-//     })
-// })
-
-
-// Post blog using async/await
 blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
   const body = request.body
   const user = request.user
@@ -75,7 +42,7 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
 
 blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
   const user = request.user
-  console.log('user', user)
+  // console.log('user', user)
   
   const blog = await Blog.findById(request.params.id)
   if (!blog) {
@@ -89,6 +56,11 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) =
   }
 
   await Blog.findByIdAndDelete(request.params.id)
+
+  // Remove blog from user table
+  user.blogs = user.blogs.filter(blog => blog.toString() !== request.params.id)
+  await user.save()
+
   response.status(204).end()
 })
 
