@@ -117,7 +117,7 @@ test('a valid blog can be added', async () => {
     const blogsAtStart = await helper.blogsInDb()
     // const loginResponse = await helper.login()
     const newBlog = {
-        title: 'Blog test',
+        title: 'This is a valid blog',
         author: 'Sergey V',
         url: 'http://localhost/33',
         likes: 5,
@@ -134,7 +134,27 @@ test('a valid blog can be added', async () => {
     assert.strictEqual(blogsAtEnd.length, blogsAtStart.length + 1)
 
     const contents = blogsAtEnd.map(blog => blog.title)
-    assert.strictEqual(contents.includes('Blog test'), true)
+    assert.strictEqual(contents.includes('This is a valid blog'), true)
+})
+
+test('blog without token is not added', async () => {
+    const newBlog = {
+        title: 'This blog has not been added',
+        author: 'Sergey V',
+        url: 'http://localhost/34',
+        likes: 5
+    }
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, 3)
+
+    const contents = blogsAtEnd.map(blog => blog.title)
+    assert.strictEqual(contents.includes('This blog has not been added'), false)
 })
 
 
@@ -204,6 +224,7 @@ test('a blog can be updated', async () => {
     }
     await api
         .put(`/api/blogs/${blogToUpdate.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(updatedBlog)
 
     const blogsAtEnd = await helper.blogsInDb()
