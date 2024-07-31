@@ -29,6 +29,12 @@ before(async () => {
     await Promise.all(promiseArray)
 })
 
+beforeEach(async () => {
+    const user = await User.findOne({username: 'test'})
+    user.blogs = []
+    await user.save()
+})
+
 // Add Blog with user field and add it to user
 beforeEach(async () => {
     const user = await User.findOne({username: 'test'})
