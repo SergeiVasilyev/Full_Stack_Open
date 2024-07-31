@@ -1,4 +1,4 @@
-const {test, after, beforeEach} = require('node:test')
+const {test, after, beforeEach, before} = require('node:test')
 const mongoose = require('mongoose')
 const Blog = require('../models/blog')
 const User = require('../models/user')
@@ -9,6 +9,9 @@ const assert = require('node:assert')
 const api = supertest(app)
 
 
+let loggedInUser
+let token
+
 beforeEach(async () => {
     await Blog.deleteMany({})
     const blogObjects = helper.initialBlogs
@@ -17,7 +20,7 @@ beforeEach(async () => {
     await Promise.all(promiseArray)
 })
 
-beforeEach(async () => {
+before(async () => {
     await User.deleteMany({})
     const users = await helper.initUsers()
     const userObjects = users
@@ -41,6 +44,15 @@ beforeEach(async () => {
 
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
+})
+
+// Login a user
+before(async () => {
+    const loginResponse = await helper.login()
+    loggedInUser = await User.findOne({username: 'test'})
+    token = loginResponse.body.token
+    // console.log(loggedInUser, token)
+    console.log('loggedInUser id', loggedInUser.id)
 })
 
 test('create a user', async () => {
@@ -103,17 +115,17 @@ test('unique identifier property is called id', async () => {
 
 test('a valid blog can be added', async () => {
     const blogsAtStart = await helper.blogsInDb()
-    const loginResponse = await helper.login()
+    // const loginResponse = await helper.login()
     const newBlog = {
         title: 'Blog test',
         author: 'Sergey V',
         url: 'http://localhost/33',
         likes: 5,
-        user: loginResponse.body.id
+        user: loggedInUser.id
     }
     await api
         .post('/api/blogs')
-        .set('Authorization', `Bearer ${loginResponse.body.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -128,17 +140,16 @@ test('a valid blog can be added', async () => {
 
 test('likes property by defaults is 0', async () => {
     const blogsAtStart = await helper.blogsInDb()
-    const loginResponse = await helper.login()
 
     const newBlog = {
-        title: 'Blog test',
+        title: 'Blog test 2',
         author: 'Sergey V',
-        url: 'http://localhost/33',
-        user: loginResponse.body.id
+        url: 'http://localhost/34',
+        user: loggedInUser.id
     }
     await api
         .post('/api/blogs')
-        .set('Authorization', `Bearer ${loginResponse.body.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -146,21 +157,19 @@ test('likes property by defaults is 0', async () => {
     const blogsAtEnd = await helper.blogsInDb()
     assert.strictEqual(blogsAtEnd.length, blogsAtStart.length + 1)
     
-    const blog = blogsAtEnd.find(blog => blog.title === 'Blog test')
+    const blog = blogsAtEnd.find(blog => blog.title === 'Blog test 2')
     assert.strictEqual(blog.likes, 0)
 })
 
 test('blog without required properties is not added', async () => {
-    const loginResponse = await helper.login()
-
     const newBlog = {
         author: 'Sergey V',
         likes: 153,
-        user: loginResponse.body.id
+        user: loggedInUser.id
     }
     const response = await api
         .post('/api/blogs')
-        .set('Authorization', `Bearer ${loginResponse.body.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400)
 
@@ -171,12 +180,11 @@ test('blog without required properties is not added', async () => {
 
 
 test('a blog can be deleted', async () => {
-    const loginResponse = await helper.login()
     const blogsAtStart = await helper.blogsInDb()
     const blogToDelete = blogsAtStart[blogsAtStart.length - 1]
     await api
         .delete(`/api/blogs/${blogToDelete.id}`)
-        .set('Authorization', `Bearer ${loginResponse.body.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
@@ -184,7 +192,6 @@ test('a blog can be deleted', async () => {
 
     const contents = blogsAtEnd.map(blog => blog.title)
     assert.strictEqual(contents.includes(blogToDelete.title), false)
-
 })
 
 test('a blog can be updated', async () => {
