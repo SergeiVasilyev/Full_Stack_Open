@@ -1,5 +1,12 @@
 # Full Stack Open
 
+Hi there,
+This is my implementation of the Full Stack Open course that I do in my spare time.
+
+Below you will find all the information about this course.
+
+-----
+
 https://fullstackopen.com/en/
 
 
