@@ -3,6 +3,7 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import BlogForm from './components/BlogForm'
+import {jwtDecode} from 'jwt-decode'
 
 
 const Notification = ({ message }) => {
@@ -62,10 +63,22 @@ const App = () => {
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+    console.log('loggedUserJSON', loggedUserJSON)
+    
+    const token =
+      JSON.parse(localStorage.getItem("loggedBlogappUser")) &&
+      JSON.parse(localStorage.getItem("loggedBlogappUser"))["token"]
+    console.log("token", token)
+
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
+      if (jwtDecode(token).exp < Date.now() / 1000) {
+        console.log(Date.now() / 1000, jwtDecode(token).exp)
+        handleLogout()
+      } else {
+        const user = JSON.parse(loggedUserJSON)
+        setUser(user)
+        blogService.setToken(user.token)
+      }
     }
   }, [])
 
