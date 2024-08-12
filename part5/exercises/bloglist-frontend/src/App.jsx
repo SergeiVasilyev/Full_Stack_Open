@@ -4,15 +4,20 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import BlogForm from './components/BlogForm'
 import {jwtDecode} from 'jwt-decode'
+import './App.css'
 
 
-const Notification = ({ message }) => {
+const Notification = ({ message, className }) => {
+  if (message === '' || message === null) {
+    className = ''
+  }
+
   if (message === null) {
     return null
   }
 
   return (
-    <div className='error'>
+    <div className={className}>
       {message}
     </div>
   )
@@ -21,6 +26,7 @@ const Notification = ({ message }) => {
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
@@ -53,6 +59,10 @@ const App = () => {
       setUrl('')
       console.log('response', response)
       console.log('title', title, 'author', author, 'url', url)
+      setSuccessMessage(`a new blog ${response.title} by ${response.author} added`)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
     } catch (exception) {
       setErrorMessage(exception.response.data.error)
       setTimeout(() => {
@@ -64,7 +74,7 @@ const App = () => {
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     console.log('loggedUserJSON', loggedUserJSON)
-    
+
     const token =
       JSON.parse(localStorage.getItem("loggedBlogappUser")) &&
       JSON.parse(localStorage.getItem("loggedBlogappUser"))["token"]
@@ -99,8 +109,12 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      setSuccessMessage(`welcome back ${user.name}`)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
     } catch (exception) {
-      setErrorMessage('Wrong credentials' + exception)
+      setErrorMessage('Wrong Username or Password: ' + exception)
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -110,6 +124,12 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
+
+    setSuccessMessage('you logged out')
+    setTimeout(() => {
+      setSuccessMessage(null)
+    }, 5000)
+    
     setUser(null)
   }
 
@@ -147,7 +167,8 @@ const App = () => {
 
   return (
     <div>
-      <Notification message={errorMessage} />
+      <Notification message={errorMessage} className="error"/>
+      <Notification message={successMessage} className="success" />
       {user === null ?
         loginForm() :
         <div>
