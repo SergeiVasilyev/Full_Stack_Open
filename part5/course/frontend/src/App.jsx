@@ -126,18 +126,11 @@ const App = (props) => {
     setNewNote(event.target.value)
   }
 
-  const addNote = (event) => {
-    event.preventDefault()
-    const noteObject = {
-      content: newNote,
-      important: Math.random() < 0.5,
-    }
-  
+  const addNote = (noteObject) => {
     noteService
       .create(noteObject)
       .then(returnedNote => {
         setNotes(notes.concat(returnedNote))
-        setNewNote('')
       })
   }
 
@@ -182,16 +175,13 @@ const App = (props) => {
         <button onClick={() => handleLogout()}>logout</button>
         <p></p>
         <Togglable buttonLabel="new note">
-          <NoteForm
-            onSubmit={addNote}
-            value={newNote}
-            handleChange={handleNoteChange}
-          />
+          <NoteForm createNote={addNote} />
         </Togglable>
         </div>
       } 
 
       <div>
+        <p></p>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? 'important' : 'all' }
         </button>
