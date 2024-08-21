@@ -64,7 +64,7 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) =
   response.status(204).end()
 })
 
-
+// Update blog for owners (Owners can change all fields except likes)
 blogsRouter.put('/:id', middleware.userExtractor, async (request, response) => {
   const user = request.user
   const body = request.body
@@ -80,11 +80,12 @@ blogsRouter.put('/:id', middleware.userExtractor, async (request, response) => {
     return response.status(401).json({ error: 'This blog was created by another user' })
   }
 
+  // Users can only like other people's blogs
   const blogForUpdate = {
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes,
+    likes: blog.likes,
     user: user.id
   }
 
@@ -92,6 +93,24 @@ blogsRouter.put('/:id', middleware.userExtractor, async (request, response) => {
   response.status(201).json(updatedBlog)
 })
 
+// Update likes
+blogsRouter.put('/like/:id', async (request, response) => {
+  const body = request.body
+  const blog = await Blog.findById(request.params.id)
+  if (!blog) {
+    return response.status(404).json({ error: 'blog not found' })
+  }
 
+  const blogForUpdate = {
+    title: blog.title,
+    author: blog.author,
+    url: blog.url,
+    likes: body.likes,
+    user: blog.user
+  }
+
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogForUpdate, { new: true })
+  response.status(201).json(updatedBlog)
+})
 
 module.exports = blogsRouter
