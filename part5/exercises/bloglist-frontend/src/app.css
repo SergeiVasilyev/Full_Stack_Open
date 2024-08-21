@@ -17,3 +17,11 @@
     padding: 10px;
     margin-bottom: 10px;
 }
+
+.blog-title {
+    font-size: 1.2em;
+}
+
+.blog-info {
+    padding-left: 1em;
+}
