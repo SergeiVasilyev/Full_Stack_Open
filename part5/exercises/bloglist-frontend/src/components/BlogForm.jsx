@@ -9,8 +9,9 @@ const BlogForm = ({ handleAddBlog }) => {
     const addBlog = (event) => {
         event.preventDefault()
         handleAddBlog({
-            title, author, url
+            title, author, url, likes: 0
         })
+        console.log('title', title, 'author', author, 'url', url)
         setTitle('')
         setAuthor('')
         setUrl('')

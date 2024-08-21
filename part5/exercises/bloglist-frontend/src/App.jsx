@@ -31,22 +31,7 @@ const App = () => {
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const blogFormRef = useRef()
-
-
-  const handleTitleChange = (event) => {
-    setTitle(event.target.value)
-    console.log('title', title)
-  }
-  const handleAuthorChange = (event) => {
-    setAuthor(event.target.value)
-  }
-  const handleUrlChange = (event) => {
-    setUrl(event.target.value)
-  }
 
 
   const handleAddBlog = async (blogObject) => {
@@ -54,11 +39,7 @@ const App = () => {
     try {
       const response = await blogService.createBlog(blogObject)
       setBlogs(blogs.concat(response))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
       console.log('response', response)
-      console.log('title', title, 'author', author, 'url', url)
       setSuccessMessage(`a new blog ${response.title} by ${response.author} added`)
       setTimeout(() => {
         setSuccessMessage(null)
@@ -71,30 +52,6 @@ const App = () => {
     }
   }
 
-  const handleSubmitBlog = async (event) => {
-    event.preventDefault()
-    const blogObject = {
-      title, author, url, likes: 0
-    }
-    try {
-      const response = await blogService.createBlog(blogObject)
-      setBlogs(blogs.concat(response))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      console.log('response', response)
-      console.log('title', title, 'author', author, 'url', url)
-      setSuccessMessage(`a new blog ${response.title} by ${response.author} added`)
-      setTimeout(() => {
-        setSuccessMessage(null)
-      }, 5000)
-    } catch (exception) {
-      setErrorMessage(exception.response.data.error)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-    }
-  }
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -103,7 +60,6 @@ const App = () => {
     const token =
       JSON.parse(localStorage.getItem("loggedBlogappUser")) &&
       JSON.parse(localStorage.getItem("loggedBlogappUser"))["token"]
-    console.log("token", token)
 
     if (loggedUserJSON) {
       if (jwtDecode(token).exp < Date.now() / 1000) {
