@@ -46,6 +46,28 @@ const App = () => {
     setUrl(event.target.value)
   }
 
+
+  const handleAddBlog = async (blogObject) => {
+    try {
+      const response = await blogService.createBlog(blogObject)
+      setBlogs(blogs.concat(response))
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+      console.log('response', response)
+      console.log('title', title, 'author', author, 'url', url)
+      setSuccessMessage(`a new blog ${response.title} by ${response.author} added`)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
+    } catch (exception) {
+      setErrorMessage(exception.response.data.error)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
   const handleSubmitBlog = async (event) => {
     event.preventDefault()
     const blogObject = {
@@ -174,7 +196,7 @@ const App = () => {
         <div>
           <p>{user.name} logged-in</p>
           <button onClick={() => handleLogout()}>logout</button>
-          <BlogForm handleTitleChange={handleTitleChange} handleAuthorChange={handleAuthorChange} handleUrlChange={handleUrlChange} title={title} author={author} url={url} handleSubmitBlog={handleSubmitBlog} />
+          <BlogForm handleAddBlog={handleAddBlog} />
         </div>
       }
       <h2>blogs</h2>
