@@ -66,18 +66,26 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) =
 
 
 blogsRouter.put('/:id', middleware.userExtractor, async (request, response) => {
+  const user = request.user
   const body = request.body
 
   const blog = await Blog.findById(request.params.id)
   if (!blog) {
     return response.status(404).json({ error: 'blog not found' })
   }
+  if (!blog.user) { // if the blog has no user attribute
+    return response.status(401).json({ error: 'This blog was created by another user' })
+  }
+  if (blog.user.toString() !== user.id) { // if the blog was created by another user
+    return response.status(401).json({ error: 'This blog was created by another user' })
+  }
 
   const blogForUpdate = {
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes
+    likes: body.likes,
+    user: user.id
   }
 
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogForUpdate, { new: true })
