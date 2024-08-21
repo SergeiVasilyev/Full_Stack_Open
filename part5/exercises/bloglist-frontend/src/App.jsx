@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import BlogForm from './components/BlogForm'
 import {jwtDecode} from 'jwt-decode'
+import Togglable from './components/Togglable'
 import './App.css'
 
 
@@ -33,6 +34,7 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const blogFormRef = useRef()
 
 
   const handleTitleChange = (event) => {
@@ -48,6 +50,7 @@ const App = () => {
 
 
   const handleAddBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility()
     try {
       const response = await blogService.createBlog(blogObject)
       setBlogs(blogs.concat(response))
@@ -196,7 +199,10 @@ const App = () => {
         <div>
           <p>{user.name} logged-in</p>
           <button onClick={() => handleLogout()}>logout</button>
-          <BlogForm handleAddBlog={handleAddBlog} />
+          <p></p>
+          <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
+            <BlogForm handleAddBlog={handleAddBlog} />
+          </Togglable>
         </div>
       }
       <h2>blogs</h2>
