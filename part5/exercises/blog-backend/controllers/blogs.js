@@ -11,7 +11,7 @@ blogsRouter.get('/', async (request, response) => {
 
 
 blogsRouter.get('/:id', async (request, response) => {
-  const blog = await Blog.findById(request.params.id)
+  const blog = await Blog.findById(request.params.id).populate('user', { username: 1, name: 1 })
   if (blog) {
     response.json(blog)
   } else {
@@ -89,14 +89,14 @@ blogsRouter.put('/:id', middleware.userExtractor, async (request, response) => {
     user: user.id
   }
 
-  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogForUpdate, { new: true })
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogForUpdate, { new: true }).populate('user', { username: 1, name: 1 })
   response.status(201).json(updatedBlog)
 })
 
 // Update likes
 blogsRouter.put('/like/:id', async (request, response) => {
   const body = request.body
-  const blog = await Blog.findById(request.params.id)
+  const blog = await Blog.findById(request.params.id).populate('user', { username: 1, name: 1 })
   if (!blog) {
     return response.status(404).json({ error: 'blog not found' })
   }
@@ -109,7 +109,7 @@ blogsRouter.put('/like/:id', async (request, response) => {
     user: blog.user
   }
 
-  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogForUpdate, { new: true })
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogForUpdate, { new: true }).populate('user', { username: 1, name: 1 })
   response.status(201).json(updatedBlog)
 })
 
