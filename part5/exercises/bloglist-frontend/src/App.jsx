@@ -3,7 +3,7 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import BlogForm from './components/BlogForm'
-import {jwtDecode} from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 import Togglable from './components/Togglable'
 import './App.css'
 
@@ -28,8 +28,8 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const blogFormRef = useRef()
 
@@ -58,8 +58,8 @@ const App = () => {
     console.log('loggedUserJSON', loggedUserJSON)
 
     const token =
-      JSON.parse(localStorage.getItem("loggedBlogappUser")) &&
-      JSON.parse(localStorage.getItem("loggedBlogappUser"))["token"]
+      JSON.parse(localStorage.getItem('loggedBlogappUser')) &&
+      JSON.parse(localStorage.getItem('loggedBlogappUser'))['token']
 
     if (loggedUserJSON) {
       if (jwtDecode(token).exp < Date.now() / 1000) {
@@ -76,7 +76,7 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({
         username, password,
@@ -84,7 +84,7 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
-      ) 
+      )
 
       blogService.setToken(user.token)
       setUser(user)
@@ -110,7 +110,7 @@ const App = () => {
     setTimeout(() => {
       setSuccessMessage(null)
     }, 5000)
-    
+
     setUser(null)
   }
 
@@ -118,7 +118,7 @@ const App = () => {
     <form onSubmit={handleLogin}>
       <div>
         username
-          <input
+        <input
           type="text"
           value={username}
           name="Username"
@@ -127,7 +127,7 @@ const App = () => {
       </div>
       <div>
         password
-          <input
+        <input
           type="password"
           value={password}
           name="Password"
@@ -135,7 +135,7 @@ const App = () => {
         />
       </div>
       <button type="submit">login</button>
-    </form>      
+    </form>
   )
 
   const handleLike = async (blog) => {
@@ -164,13 +164,13 @@ const App = () => {
       }
     }
   }
-  
+
 
   useEffect(() => {
     blogService.getAll().then(blogs => {
       blogs.sort((a, b) => b.likes - a.likes)
       setBlogs( blogs )
-  })  
+    })
   }, [])
 
   return (
