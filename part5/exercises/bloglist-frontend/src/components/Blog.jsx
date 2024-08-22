@@ -1,8 +1,17 @@
 import { useState } from "react"
 
-const Blog = ({ blog, handleLike }) => {
+const Blog = ({ blog, handleLike, user, handleRemove }) => {
   const [show, setShow] = useState(false)
-  
+
+  const checkUser = () => {
+    if (user && 'user' in blog) {
+      if (user.username === blog.user.username) {
+        return true
+      }
+    }
+    return false
+  }
+
   const blogStyle = {
     paddingTop: 2,
     paddingLeft: 2,
@@ -19,6 +28,7 @@ const Blog = ({ blog, handleLike }) => {
       <p>{blog.url}</p>
       <p>likes {blog.likes} <button onClick={() => handleLike(blog)}>like</button></p>
       <p>{blog.author}</p>
+      {checkUser() ? <button onClick={() => handleRemove(blog)}>remove</button> : null}
     </div>
   </div>  
 )}
