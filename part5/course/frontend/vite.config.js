@@ -12,6 +12,11 @@ export default defineConfig({
       },
     }
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './testSetup.js', 
+  }
 })
 
 // https://fullstackopen.com/en/part3/deploying_app_to_internet
