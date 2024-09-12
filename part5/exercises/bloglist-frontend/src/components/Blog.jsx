@@ -23,11 +23,11 @@ const Blog = ({ blog, handleLike, user, handleRemove }) => {
 
   return (
     <div style={blogStyle}>
-      <p className="blog-title">{blog.title} <button onClick={() => setShow(!show)}>{show ? 'hide' : 'see more'}</button></p>
+      <p className="blog-title">{blog.title}</p>
+      <p>{blog.author} <button onClick={() => setShow(!show)}>{show ? 'hide' : 'see more'}</button></p>
       <div className="blog-info" style={showStyle}>
         <p>{blog.url}</p>
         <p>likes {blog.likes} <button onClick={() => handleLike(blog)}>like</button></p>
-        <p>{blog.author}</p>
         {checkUser() ? <button onClick={() => handleRemove(blog)}>remove</button> : null}
       </div>
     </div>
