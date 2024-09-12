@@ -3,7 +3,8 @@ import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
 
-const mockHandler = vi.fn()
+const mockHandlerSeeMore = vi.fn()
+const mockHandlerLikes = vi.fn()
 let container
 
 beforeEach(() => {
@@ -14,8 +15,13 @@ beforeEach(() => {
         likes: 0
     }
 
-    container = render(<Blog blog={blog} />).container
+    container = render(<Blog blog={blog} handleLike={mockHandlerLikes} />).container
 
+})
+
+afterEach(() => {
+    // vi.clearAllMocks()
+    vi.resetAllMocks()
 })
 
 test('Rendering title and author', async () => {
@@ -40,10 +46,10 @@ test('Clicking "see more" button calls event handler once and renders url and li
     
     const user = userEvent.setup()
     const button = screen.getByText('see more')
-    button.onclick = mockHandler
+    button.onclick = mockHandlerSeeMore
     screen.debug(button)
     await user.click(button)
-    expect(mockHandler.mock.calls).toHaveLength(1)
+    expect(mockHandlerSeeMore.mock.calls).toHaveLength(1)
     expect(divBlogInfo).toHaveStyle('display: block')
 
     const url = screen.getByText('https://example.com/')
@@ -53,6 +59,21 @@ test('Clicking "see more" button calls event handler once and renders url and li
     expect(likes).toBeDefined()
 })
 
+
+test('Clicking "like" button twice calls event handler twice', async () => {
+    const divBlogInfo = container.querySelector('.blog-info')
+    
+    const user = userEvent.setup()
+    const button = screen.getByText('see more')
+    button.onclick = mockHandlerSeeMore
+    await user.click(button)
+    expect(divBlogInfo).toHaveStyle('display: block')
+
+    const likeButton = screen.getByText('like')
+    await user.click(likeButton)
+    await user.click(likeButton)
+    expect(mockHandlerLikes.mock.calls).toHaveLength(2)
+})
 
 
 
