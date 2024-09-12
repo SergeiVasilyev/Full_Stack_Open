@@ -11,6 +11,8 @@ test('renders content', async () => {
         likes: 0
     }
 
+    const mockHandler = vi.fn()
+
     const { container } = render(<Blog blog={blog} />)
     screen.debug()
 
@@ -22,6 +24,14 @@ test('renders content', async () => {
 
     const divBlogInfo = container.querySelector('.blog-info')
     expect(divBlogInfo).toHaveStyle('display: none')
+
+    const user = userEvent.setup()
+    const button = screen.getByText('see more')
+    button.onclick = mockHandler
+    screen.debug(button)
+    await user.click(button)
+    expect(mockHandler.mock.calls).toHaveLength(1)
+    expect(divBlogInfo).toHaveStyle('display: block')
 })
 
 
