@@ -3,7 +3,7 @@ const { loginWith, createNote } = require('./helper')
 
 describe('Note app', () => {
   beforeEach(async ({ page, request }) => {
-    await request.post('/api/tests/reset') //http://localhost:3001/api/testing/reset
+    await request.post('http://localhost:3001/api/testing/reset') //http://localhost:3001/api/testing/reset
     await request.post('http://localhost:3001/api/users', {
       data: {
         name: 'Superuser',
@@ -86,6 +86,22 @@ describe('Note app', () => {
         await expect(page.getByText('make important')).toBeVisible()
       })
     })
+
+    describe('and several notes exists', () => {
+      beforeEach(async ({ page }) => {
+        await createNote(page, 'first note', true)
+        await createNote(page, 'second note', true)
+      })
+  
+      test('one of those can be made nonimportant', async ({ page }) => {
+        const otherNoteText = await page.getByText('first note')
+        const otherNoteElement = await otherNoteText.locator('..') // Get the parent of the element
+
+        await otherNoteElement.getByRole('button', { name: 'make not important' }).click()
+        await expect(otherNoteElement.getByText('make important')).toBeVisible()
+      })
+    })
+
   })
 })
 
