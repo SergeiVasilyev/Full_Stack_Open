@@ -103,6 +103,7 @@ describe('Note app', () => {
       })
 
       test('one of those can be made nonimportant 2', async ({ page }) => {
+        // await page.pause()
         const secondNoteElement = await page.getByText('second note').locator('..')
         await secondNoteElement.getByRole('button', { name: 'make not important' }).click()
         await expect(secondNoteElement.getByText('make important')).toBeVisible()
