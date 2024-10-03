@@ -10,6 +10,13 @@ describe('Blog app', () => {
         password: 'salainen'
       }
     })
+    await request.post('/api/users', {
+      data: {
+        name: 'User 2',
+        username: 'user2',
+        password: 'salainen'
+      }
+    })
     await page.goto('/')
   })
 
@@ -94,7 +101,7 @@ describe('Blog app', () => {
      
       page.on('dialog', async (dialog) => {
         expect(dialog.type()).toContain('confirm')
-        expect(dialog.message()).toContain('Are you sure you want to remove blog Test blog2 by Test author2?')
+        expect(dialog.message()).toContain('Are you sure you want to remove Test blog2 by Test author2?')
         await dialog.accept() // or dialog.dismiss()
       })
       const removeButton = page.getByText('Test author2').locator('..').getByRole('button', { name: 'remove' })
@@ -104,6 +111,36 @@ describe('Blog app', () => {
       await expect(page.getByText('Test author2 hide')).not.toBeVisible()
     })
 
+      
+    test('Check that only the user who created the blog can delete it', async ({ page }) => {
+      await page.getByRole('button', { name: 'Create new blog' }).click()
+      await page.locator('input[name="Title"]').fill('Test blog')
+      await page.locator('input[name="Author"]').fill('Test author')
+      await page.locator('input[name="Url"]').fill('https://test.com')
+      await page.getByRole('button', { name: 'Create' }).click()
 
+      await expect(page.getByText('a new blog Test blog by Test author added')).toBeVisible()
+      await expect(page.getByText('Test author see more')).toBeVisible()
+
+      await page.getByRole('button', { name: 'logout' }).click()
+
+      await page.locator('input[name="Username"]').fill('user2')
+      await page.locator('input[name="Password"]').fill('salainen')
+      await page.getByRole('button', { name: 'login' }).click()
+
+      await page.getByRole('button', { name: 'Create new blog' }).click()
+      await page.locator('input[name="Title"]').fill('Test blog2')
+      await page.locator('input[name="Author"]').fill('Test author2')
+      await page.locator('input[name="Url"]').fill('https://test.com')
+      await page.getByRole('button', { name: 'Create' }).click()
+
+      await expect(page.getByText('a new blog Test blog2 by Test author2 added')).toBeVisible()
+      await expect(page.getByText('Test author2 see more')).toBeVisible()
+
+      await page.getByText('Test author see more').getByRole('button').click()
+
+      const removeButton = page.getByText('Test author').locator('..').getByRole('button', { name: 'remove' })
+      await expect(removeButton).not.toBeVisible()
+    })
   })
 })
