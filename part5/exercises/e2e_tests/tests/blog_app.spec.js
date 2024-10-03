@@ -69,14 +69,39 @@ describe('Blog app', () => {
       await page.locator('input[name="Url"]').fill('https://test.com')
       await page.getByRole('button', { name: 'Create' }).click()
 
-      await page.getByText('a new blog Test blog2 by Test author2 added').click()
-
       await page.getByText('Test author2 see more').getByRole('button').click()
       await expect(page.getByText('Test author2').locator('..').nth(1).getByText('likes 0')).toBeVisible()
       await expect(page.getByText('Test author2').locator('..').getByRole('button', { name: 'like' })).toBeVisible()
 
       await page.getByText('Test author2').locator('..').getByRole('button', { name: 'like' }).click()
       await expect(page.getByText('Test author2').locator('..').getByText('likes 1')).toBeVisible()
+    })
+
+    test('blog can be removed', async ({ page }) => {
+      await page.getByRole('button', { name: 'Create new blog' }).click()
+      await page.locator('input[name="Title"]').fill('Test blog')
+      await page.locator('input[name="Author"]').fill('Test author')
+      await page.locator('input[name="Url"]').fill('https://test.com')
+      await page.getByRole('button', { name: 'Create' }).click()
+
+      await page.getByRole('button', { name: 'Create new blog' }).click()
+      await page.locator('input[name="Title"]').fill('Test blog2')
+      await page.locator('input[name="Author"]').fill('Test author2')
+      await page.locator('input[name="Url"]').fill('https://test.com')
+      await page.getByRole('button', { name: 'Create' }).click()
+
+      await page.getByText('Test author2 see more').getByRole('button').click()
+     
+      page.on('dialog', async (dialog) => {
+        expect(dialog.type()).toContain('confirm')
+        expect(dialog.message()).toContain('Are you sure you want to remove blog Test blog2 by Test author2?')
+        await dialog.accept() // or dialog.dismiss()
+      })
+      const removeButton = page.getByText('Test author2').locator('..').getByRole('button', { name: 'remove' })
+      await removeButton.click()
+      
+      await expect(removeButton).not.toBeVisible()
+      await expect(page.getByText('Test author2 hide')).not.toBeVisible()
     })
 
 
