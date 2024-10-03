@@ -142,5 +142,109 @@ describe('Blog app', () => {
       const removeButton = page.getByText('Test author').locator('..').getByRole('button', { name: 'remove' })
       await expect(removeButton).not.toBeVisible()
     })
+
+    test('Posts are ordered according to likes', async ({ page }) => {
+      await page.getByRole('button', { name: 'Create new blog' }).click()
+      await page.locator('input[name="Title"]').fill('Test blog')
+      await page.locator('input[name="Author"]').fill('Test author')
+      await page.locator('input[name="Url"]').fill('https://test.com')
+      await page.getByRole('button', { name: 'Create' }).click()
+
+      await page.getByRole('button', { name: 'Create new blog' }).click()
+      await page.locator('input[name="Title"]').fill('Test blog2')
+      await page.locator('input[name="Author"]').fill('Test author2')
+      await page.locator('input[name="Url"]').fill('https://test.com')
+      await page.getByRole('button', { name: 'Create' }).click()
+
+      await page.getByText('Test author2 see more').getByRole('button').click()
+      await expect(page.getByText('Test author2').locator('..').nth(1).getByText('likes 0')).toBeVisible()
+      await expect(page.getByText('Test author2').locator('..').getByRole('button', { name: 'like' })).toBeVisible()
+
+      await page.getByText('Test author2').locator('..').getByRole('button', { name: 'like' }).click()
+      await expect(page.getByText('Test author2').locator('..').getByText('likes 1')).toBeVisible()
+    })
+
+
+  })
+
+  describe('Posts are ordered according to likes', () => {
+    test('Posts are ordered according to likes', async ({ page, request }) => {
+      await request.post('/api/testing/reset')
+      await request.post('/api/users', {
+        data: {
+          name: 'Superuser',
+          username: 'user1',
+          password: 'salainen'
+        }
+      })
+      const loginResponse = await request.post('/api/login', {
+        data: {
+          username: 'user1',
+          password: 'salainen'
+        }
+      })
+
+      const loginResponseBody = await loginResponse.json()
+      console.log('loginResponseBody', loginResponseBody)
+      const token = loginResponseBody.token
+      console.log('token', token)
+
+      const response = await request.post('/api/blogs', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        data: {
+          title: 'Test blog',
+          author: 'Test author',
+          url: 'https://test.com',
+          likes: 0
+        }
+      })
+      const resJson = await response.json()
+      console.log('response', resJson)
+        
+      const response2 = await request.post('/api/blogs', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        data: {
+          title: 'Test blog2',
+          author: 'Test author2',
+          url: 'https://test.com',
+          likes: 5
+        }
+      })
+      const resJson2 = await response2.json()
+      console.log('response', resJson2)
+
+      const response3 = await request.post('/api/blogs', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        data: {
+          title: 'Test blog3',
+          author: 'Test author3',
+          url: 'https://test.com',
+          likes: 2
+        }
+      })
+      const resJson3 = await response3.json()
+      console.log('response', resJson3)
+
+      await page.goto('/')
+
+      await expect(page.locator('.blog').nth(0).getByText('Test author2')).toBeVisible()
+      await expect(page.locator('.blog').nth(1).getByText('Test author3')).toBeVisible()
+      await expect(page.locator('.blog').nth(2).getByText('Test author')).toBeVisible()
+
+      await page.locator('.blog').nth(0).getByText('Test author2 see more').getByRole('button').click()
+      await expect(page.locator('.blog').nth(0).getByText('Test author2').locator('..').getByText('likes 5')).toBeVisible()
+
+      await page.locator('.blog').nth(1).getByText('Test author3 see more').getByRole('button').click()
+      await expect(page.locator('.blog').nth(1).getByText('Test author3').locator('..').getByText('likes 2')).toBeVisible()
+
+      await page.locator('.blog').nth(2).getByText('Test author see more').getByRole('button').click()
+      await expect(page.locator('.blog').nth(2).getByText('Test author').locator('..').getByText('likes 0')).toBeVisible()
+    })
   })
 })
